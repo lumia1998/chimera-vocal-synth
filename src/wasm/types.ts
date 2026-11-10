@@ -153,6 +153,10 @@ export interface Segment {
   ipa: string;
   dur?: number;
   stress?: number;
+  /** Mandarin tone: 1–4, 5/0 neutral (the planner draws its F0 contour) */
+  tone?: number;
+  /** explicit aspiration for a stop/affricate (absent: the English positional rule) */
+  aspirated?: boolean;
   f0?: number;
   wordEnd?: boolean;
 }

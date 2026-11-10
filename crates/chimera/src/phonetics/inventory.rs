@@ -187,6 +187,7 @@ fn base() -> Vec<PhonemeDef> {
         c("ʂ", "voiceless retroflex fricative", M::Fricative, Voiceless, "retroflex", t(&[(TtX, 5.45), (TtY, 9.7), (TtCurl, 0.9)]), TIP_CURL, 0.12).cal(0.15, TtY),
         c("ʐ", "voiced retroflex fricative", M::Fricative, Voiced, "retroflex", t(&[(TtX, 5.45), (TtY, 9.7), (TtCurl, 0.9)]), TIP_CURL, 0.09).cal(0.17, TtY),
         c("ç", "voiceless palatal fricative", M::Fricative, Voiceless, "palatal", t(&[(TbX, 3.75), (TbY, 8.25)]), &BODY, 0.12).cal(0.14, TbY),
+        c("ɕ", "voiceless alveolo-palatal fricative", M::Fricative, Voiceless, "palatal", t(&[(TbX, 3.55), (TbY, 8.2)]), &BODY, 0.12),
         c("ʝ", "voiced palatal fricative", M::Fricative, Voiced, "palatal", t(&[(TbX, 3.75), (TbY, 8.25)]), &BODY, 0.09).cal(0.16, TbY),
         c("x", "voiceless velar fricative", M::Fricative, Voiceless, "velar", t(&[(TbX, 2.3), (TbY, 7.7)]), &[TbY], 0.12).cal(0.18, TbY),
         c("ɣ", "voiced velar fricative", M::Fricative, Voiced, "velar", t(&[(TbX, 2.3), (TbY, 7.7)]), &[TbY], 0.09).cal(0.2, TbY),
@@ -200,6 +201,8 @@ fn base() -> Vec<PhonemeDef> {
         c("ɮ", "voiced lateral fricative", M::Fricative, Voiced, "alveolar", tg(ALV_STOP, &[(Lateral, 0.45)]), &[TtX, TtY, Lateral], 0.09),
         // affricates
         c("ts", "voiceless alveolar affricate", M::Affricate, Voiceless, "alveolar", t(ALV_STOP), &TIP, 0.14).rel("s"),
+        c("ʈʂ", "voiceless retroflex affricate", M::Affricate, Voiceless, "retroflex", t(RETRO_STOP), TIP_CURL, 0.14).rel("ʂ"),
+        c("tɕ", "voiceless alveolo-palatal affricate", M::Affricate, Voiceless, "palatal", t(PAL_STOP), &BODY, 0.14).rel("ɕ"),
         c("dz", "voiced alveolar affricate", M::Affricate, Voiced, "alveolar", t(ALV_STOP), &TIP, 0.12).rel("z"),
         c("tʃ", "voiceless postalveolar affricate", M::Affricate, Voiceless, "postalveolar", tg(POSTALV_STOP, &[(LipProt, 0.75), (LipWidth, 0.2)]), &[TtX, TtY, LipProt, LipWidth], 0.15).rel("ʃ"),
         c("dʒ", "voiced postalveolar affricate", M::Affricate, Voiced, "postalveolar", tg(POSTALV_STOP, &[(LipProt, 0.75), (LipWidth, 0.2)]), &[TtX, TtY, LipProt, LipWidth], 0.13).rel("ʒ"),

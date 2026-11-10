@@ -166,6 +166,10 @@ struct Seg<'a> {
     ipa: &'a str,
     dur: Option<f64>,
     stress: Option<u8>,
+    /// Mandarin tone, carried through a diphthong's two parts
+    tone: Option<u8>,
+    /// explicit aspiration for a stop/affricate (`None`: the English positional rule)
+    aspirated: Option<bool>,
     f0: Option<f64>,
     def: Option<PhonemeDef>,
     vowel: Option<ArticPatch>,
@@ -196,10 +200,10 @@ pub fn plan_utterance(input: &[Segment], o: &PlanOptions) -> Plan {
             let base = durs[si];
             for (i, p) in parts.iter().enumerate() {
                 let dur = if parts.len() > 1 { base * (if i == 0 { 0.55 } else { 0.45 }) } else { base };
-                segs.push(Seg { ipa: p, dur: Some(dur), stress: s.stress, f0: s.f0, def: None, vowel: None, glide_from: i > 0 });
+                segs.push(Seg { ipa: p, dur: Some(dur), stress: s.stress, tone: s.tone, aspirated: s.aspirated, f0: s.f0, def: None, vowel: None, glide_from: i > 0 });
             }
         } else {
-            segs.push(Seg { ipa: &s.ipa, dur: Some(durs[si]), stress: s.stress, f0: s.f0, def: None, vowel: None, glide_from: false });
+            segs.push(Seg { ipa: &s.ipa, dur: Some(durs[si]), stress: s.stress, tone: s.tone, aspirated: s.aspirated, f0: s.f0, def: None, vowel: None, glide_from: false });
         }
     }
     for s in segs.iter_mut() {
@@ -218,12 +222,18 @@ pub fn plan_utterance(input: &[Segment], o: &PlanOptions) -> Plan {
         let mut d = if let Some(d) = s.dur {
             d
         } else if s.vowel.is_some() {
-            if s.stress == Some(1) {
+            let base = if s.stress == Some(1) {
                 0.17
             } else if s.stress == Some(2) {
                 0.13
             } else {
                 0.095
+            };
+            // a hand-written tone segment with no duration gets a tone-shaped default
+            match s.tone {
+                Some(3) => base * 1.35,
+                Some(0 | 5) => base * 0.6,
+                _ => base,
             }
         } else {
             s.def.map_or(0.08, |d| d.dur)
@@ -308,8 +318,9 @@ pub fn plan_utterance(input: &[Segment], o: &PlanOptions) -> Plan {
             gestures.push(Gesture::new(t0, t1, 0.012, 0.015, 8.0, one(ControlKey::CLOSURE, 1.0)).label("ʔ"));
         } else if def.voicing == Voicing::Voiceless {
             if def.manner == Manner::Stop || def.manner == Manner::Affricate {
-                // aspirated when syllable-initial before a vowel and not after /s/ (English-like)
-                let aspirated = next_vowel && !prev_seg.is_some_and(|p| p.ipa == "s");
+                // An explicit flag (Mandarin b/p, d/t, g/k, j/q, zh/ch, z/c) overrides the
+                // English rule: aspirated when syllable-initial before a vowel, not after /s/.
+                let aspirated = s.aspirated.unwrap_or_else(|| next_vowel && !prev_seg.is_some_and(|p| p.ipa == "s"));
                 let vot = if aspirated { 0.05 / rate } else { 0.012 };
                 gestures.push(Gesture::new(t0 + 0.25 * dur, t1 + vot * 0.4, 0.035, if aspirated { 0.045 } else { 0.02 }, 6.0, one(ControlKey::ABDUCTION, if aspirated { 0.36 } else { 0.22 })).label("aspiration"));
             } else {
@@ -321,6 +332,9 @@ pub fn plan_utterance(input: &[Segment], o: &PlanOptions) -> Plan {
     }
     let open_end = o.open_end == Some(true);
     let sung = o.sung == Some(true);
+    // Mandarin: any segment carrying a tone switches the phrase from English intonation to
+    // tone contours. A sung note's explicit f0 still wins (singing flattens lexical tone).
+    let tone_mode = segs.iter().any(|s| s.tone.is_some());
     // ---- breath: on through the utterance. A sung phrase's onset is planned (its first vowel
     // lands on the beat), so a singer times the breath to it: the pressure reaches full drive as
     // the first segment starts, and builds into adducted folds or behind the first constriction
@@ -351,6 +365,24 @@ pub fn plan_utterance(input: &[Segment], o: &PlanOptions) -> Plan {
     for (n, &i) in v_idx.iter().enumerate() {
         let s = &segs[i];
         let Span { t0, t1 } = times[i];
+        if tone_mode {
+            if truthy(s.f0) {
+                // a sung note keeps its own pitch; lexical tone is a speech feature
+                let r = if sung { pitch_ramp(t1 - t0) } else { 0.06 };
+                gestures.push(Gesture::new(t0, t1, r, r, 6.0, one(ControlKey::F0, s.f0.unwrap())).label("pitch"));
+            } else if let Some(tone) = s.tone {
+                if s.glide_from {
+                    // the second half of a diphthong holds the contour's end, not a new contour
+                    gestures.push(Gesture::new(t0, t1, 0.025, 0.025, 6.0, one(ControlKey::F0, f0 * tone_end(tone))).label("tone"));
+                } else {
+                    tone_gestures(tone, t0, t1, f0, &mut gestures);
+                }
+            } else {
+                // an untone'd vowel inside a Chinese phrase (a mixed Latin word): level pitch
+                gestures.push(Gesture::new(t0, t1, 0.06, 0.06, 1.0, one(ControlKey::F0, f0)).label("pitch"));
+            }
+            continue;
+        }
         // pitch holds through the consonants up to the next vowel (instead of sagging to the base)
         let hold = if n < v_idx.len() - 1 { js_max(t1, times[v_idx[n + 1]].t0 - 0.03) } else { t1 };
         let mut target: f64;
@@ -443,6 +475,33 @@ fn closes_in_front(front: &str, back: &str) -> bool {
 /// previous vowel off its note for most of its length.
 fn pitch_ramp(dur: f64) -> f64 {
     js_min(0.06, js_max(0.008, 0.5 * dur))
+}
+
+/// Mandarin tone contours as (fraction through the vowel, multiplier of the base f0).
+/// 1 high level, 2 rising, 3 dipping, 4 falling, 5/0 neutral.
+fn tone_points(tone: u8) -> &'static [(f64, f64)] {
+    match tone {
+        1 => &[(0.0, 1.15), (1.0, 1.12)],
+        2 => &[(0.0, 0.95), (0.55, 1.0), (1.0, 1.25)],
+        3 => &[(0.0, 0.95), (0.35, 0.78), (0.75, 0.76), (1.0, 1.0)],
+        4 => &[(0.0, 1.3), (0.3, 1.25), (1.0, 0.8)],
+        _ => &[(0.0, 1.0), (1.0, 0.95)],
+    }
+}
+
+/// Where a tone contour ends, for the offglide of a diphthong.
+fn tone_end(tone: u8) -> f64 {
+    tone_points(tone).last().map_or(1.0, |p| p.1)
+}
+
+/// One or more F0 gestures tracing a Mandarin tone over `[t0, t1]`.
+fn tone_gestures(tone: u8, t0: f64, t1: f64, f0: f64, out: &mut Vec<Gesture>) {
+    let d = t1 - t0;
+    for w in tone_points(tone).windows(2) {
+        let start = t0 + w[0].0 * d;
+        let end = t0 + w[1].0 * d;
+        out.push(Gesture::new(start, end, 0.025, 0.025, 6.0, one(ControlKey::F0, f0 * w[1].1)).label("tone"));
+    }
 }
 
 /// Oral gestures for one consonant constriction held acoustically from `a` to `b` (closure to

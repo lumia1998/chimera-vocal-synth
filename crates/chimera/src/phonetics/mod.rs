@@ -27,6 +27,12 @@ pub struct Segment {
     /// 0 unstressed, 1 primary, 2 secondary
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stress: Option<u8>,
+    /// Mandarin lexical tone: 1–4, 5/0 neutral. The planner draws its F0 contour on the vowel.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tone: Option<u8>,
+    /// explicit aspiration for a stop/affricate: `None` keeps the English positional rule
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub aspirated: Option<bool>,
     /// explicit pitch (Hz) for this segment (singing)
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub f0: Option<f64>,
