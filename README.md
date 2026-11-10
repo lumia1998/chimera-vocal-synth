@@ -9,8 +9,9 @@ for tests and the `chimera` CLI.
 
 - **Play**: drag the tongue, lips and jaw in a live cutaway of the head; vowel pad, encoders,
   computer keyboard and Web MIDI.
-- **Speak**: English text (CMUdict with a letter-to-sound fallback) or IPA, turned into
-  gestures and prosody, with the gestural score and a consonant chart on screen.
+- **Speak**: Chinese text or tone-marked pinyin (Mandarin tones and aspiration), English text
+  (CMUdict with a letter-to-sound fallback), or IPA, turned into gestures and prosody, with the
+  gestural score and a consonant chart on screen.
 - **Sing**: piano roll with lyrics per note; consonants land before the beat.
 - **Beatbox**: pads and a step sequencer, every drum an articulatory gesture.
 - **Bestiary**: songbird (two-voice syrinx), seal, alligator and elephant.
@@ -63,5 +64,6 @@ Agents: see [AGENTS.md](AGENTS.md).
 ## License
 
 [MIT](LICENSE). Bundled third-party files keep their own licenses: the CMU Pronouncing
-Dictionary ([public/data/CMUDICT-LICENSE.txt](public/data/CMUDICT-LICENSE.txt)) and the fonts
-([public/fonts/](public/fonts/)).
+Dictionary ([public/data/CMUDICT-LICENSE.txt](public/data/CMUDICT-LICENSE.txt)), the fonts
+([public/fonts/](public/fonts/)), and pinyin-pro
+([public/data/PINYIN-PRO-LICENSE.txt](public/data/PINYIN-PRO-LICENSE.txt)).

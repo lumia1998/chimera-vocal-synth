@@ -133,7 +133,9 @@ branching (nasal tract, sinuses, piriform fossae, two bronchi, vocal sacs, OEC).
   closures are robust; fricatives specify exact gap.
 * Text: CMUdict (lazy-loaded, compact) + rule fallback → ARPAbet → IPA; stress;
   syllabification; Klatt-style durations; intonation (declination, H* on stressed
-  syllables, final fall / question rise). Singing: notes+lyrics → syllable alignment.
+  syllables, final fall / question rise). Mandarin: Hanzi or tone-marked/numbered pinyin
+  (pinyin-pro) → IPA with lexical tone and explicit aspiration; the planner replaces
+  English intonation with tone contours. Singing: notes+lyrics → syllable alignment.
 
 ## 5. FX / output
 

@@ -51,19 +51,28 @@ export function transcribe(phrases: { segments: Segment[]; intonation?: string }
   return phrases.map((p) => p.segments.map((s) => (s.stress === 1 ? "ˈ" : s.stress === 2 ? "ˌ" : "") + s.ipa + (s.wordEnd ? " " : "")).join("").trim() + (p.intonation === "question" ? "?" : "")).join(" | ");
 }
 
-export function speakPhrases(phrases: { segments: Segment[]; intonation?: "statement" | "question" | "flat"; pause?: number; words?: string[] }[], o: { body: BodyMix; rate: number; f0: number }): SpokenPlan {
+export function speakPhrases(phrases: { segments: Segment[]; intonation?: "statement" | "question" | "flat"; pause?: number; words?: string[] }[], o: { body: BodyMix; rate: number; f0: number }, transcription?: string): SpokenPlan {
   const plan = planPhrases(phrases, { body: o.body, t0: 0, rate: o.rate, f0: o.f0 });
   const id = engine.schedule({ gestures: plan.gestures.map((g: Gesture) => ({ ...g, targets: { ...g.targets } })), segments: plan.segments, end: plan.end });
-  current = { plan, offset: null, id, transcription: transcribe(phrases), words: wordSpans(phrases, plan) };
+  current = { plan, offset: null, id, transcription: transcription ?? transcribe(phrases), words: wordSpans(phrases, plan) };
   for (const l of listeners) l(current);
   return current;
 }
 
-export async function speakText(text: string, o: { ipa: boolean; body: BodyMix; rate: number; f0: number }): Promise<SpokenPlan | null> {
+export type InputLanguage = "zh" | "en" | "ipa";
+
+export async function speakText(text: string, o: { lang: InputLanguage; body: BodyMix; rate: number; f0: number }): Promise<SpokenPlan | null> {
   if (!text.trim()) return null;
   let phrases: Phrase[];
-  if (o.ipa) phrases = ipaToPhrases(text);
-  else {
+  let transcription: string | undefined;
+  if (o.lang === "ipa") phrases = ipaToPhrases(text);
+  else if (o.lang === "zh") {
+    // pinyin-pro is a separate chunk, loaded the first time Chinese is spoken
+    const { chineseToPhrases } = await import("./chinese.ts");
+    const r = await chineseToPhrases(text);
+    phrases = r.phrases;
+    transcription = r.transcription;
+  } else {
     try {
       await g2p.load();
     } catch {
@@ -72,7 +81,7 @@ export async function speakText(text: string, o: { ipa: boolean; body: BodyMix; 
     phrases = g2p.toPhrases(text);
   }
   if (!phrases.length) return null;
-  return speakPhrases(phrases, o);
+  return speakPhrases(phrases, o, transcription);
 }
 
 export function stopSpeaking(): void {
