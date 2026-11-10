@@ -60,8 +60,8 @@ export function TubeView() {
       p.lineTo(jx + nLen, nTop + off);
       beam(ctx, p, nc, 1, { dash });
     }
-    label(ctx, "NOSE", jx + nLen + 6, nTop + 3, { size: 9, color: TEXT.secondary, ls: 0.16 });
-    label(ctx, open ? `VELUM OPEN ${velum.toFixed(2)} CM²` : "VELUM SHUT", jx, nTop - 12, { size: 9, color: TEXT.secondary, ls: 0.16, align: "center" });
+    label(ctx, "鼻", jx + nLen + 6, nTop + 3, { size: 9, color: TEXT.secondary, ls: 0.16 });
+    label(ctx, open ? `软腭开 ${velum.toFixed(2)} cm²` : "软腭闭", jx, nTop - 12, { size: 9, color: TEXT.secondary, ls: 0.16, align: "center" });
 
     // silhouette and rings
     const top: Pt[] = [[x0, axisY - 3], ...secs.map((q) => [q.x, axisY - q.r] as Pt), [x1, axisY - secs[secs.length - 1].r]];
@@ -78,7 +78,7 @@ export function TubeView() {
 
     // landmarks
     const f = m.frame(tele ? VoiceModel.articFromArray(tele.t.artic) : st.artic);
-    const marks: [number, string][] = [[0, "GLOTTIS"], [phLen, "VELUM"], [f.teethS, "TEETH"], [total, "LIPS"]];
+    const marks: [number, string][] = [[0, "声门"], [phLen, "软腭"], [f.teethS, "齿"], [total, "嘴唇"]];
     let lastRight = -Infinity;
     for (const [s, name] of marks) {
       const x = x0 + s * sx;
@@ -90,5 +90,5 @@ export function TubeView() {
       label(ctx, name, lx, h - 9, { size: 9, color: TEXT.secondary, ls: 0.16 });
     }
   });
-  return <canvas ref={ref} className="instrument-canvas" aria-label="Area function of the simulated tube, lit by sound pressure" role="img" />;
+  return <canvas ref={ref} className="instrument-canvas" aria-label="模拟声道的面积函数，由声压点亮" role="img" />;
 }

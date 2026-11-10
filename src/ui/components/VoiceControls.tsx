@@ -23,54 +23,54 @@ export function VoiceControls() {
   const setArtic = useStore((st) => st.setArtic);
   const pages: EncoderPage[] = [
     {
-      name: "Voice",
+      name: "嗓音",
       encoders: [
-        { label: "Pitch", value: s.f0, min: 40, max: 1100, log: true, onChange: (v) => setSource({ f0: v }), format: (v) => ({ value: v.toFixed(0), unit: `Hz ${noteName(v)}` }) },
-        { label: "Breath", value: s.pressure, min: 2, max: 22, onChange: (v) => setSource({ pressure: v }), format: (v) => ({ value: v.toFixed(1), unit: "cmH₂O" }) },
-        { label: "Pressed", value: s.tension, min: 0, max: 1, onChange: (v) => setSource({ tension: v }), format: pct },
-        { label: "Vibrato", value: s.vibratoDepth, min: 0, max: 120, onChange: (v) => setSource({ vibratoDepth: v }), format: (v) => ({ value: v.toFixed(0), unit: "cents" }) },
+        { label: "音高", value: s.f0, min: 40, max: 1100, log: true, onChange: (v) => setSource({ f0: v }), format: (v) => ({ value: v.toFixed(0), unit: `Hz ${noteName(v)}` }) },
+        { label: "气息", value: s.pressure, min: 2, max: 22, onChange: (v) => setSource({ pressure: v }), format: (v) => ({ value: v.toFixed(1), unit: "cmH₂O" }) },
+        { label: "紧张", value: s.tension, min: 0, max: 1, onChange: (v) => setSource({ tension: v }), format: pct },
+        { label: "颤音", value: s.vibratoDepth, min: 0, max: 120, onChange: (v) => setSource({ vibratoDepth: v }), format: (v) => ({ value: v.toFixed(0), unit: "cents" }) },
       ],
     },
     {
-      name: "Tone",
+      name: "音色",
       encoders: [
-        { label: "Bright", value: s.brightness, min: 0, max: 1, onChange: (v) => setSource({ brightness: v }), format: pct },
-        { label: "Breathy", value: s.breathiness, min: 0, max: 1, onChange: (v) => setSource({ breathiness: v }), format: pct },
-        { label: "Rough", value: s.roughness, min: 0, max: 1, onChange: (v) => setSource({ roughness: v }), format: pct },
-        { label: "Fry", value: s.fry, min: 0, max: 1, onChange: (v) => setSource({ fry: v }), format: pct },
+        { label: "明亮", value: s.brightness, min: 0, max: 1, onChange: (v) => setSource({ brightness: v }), format: pct },
+        { label: "气声", value: s.breathiness, min: 0, max: 1, onChange: (v) => setSource({ breathiness: v }), format: pct },
+        { label: "粗糙", value: s.roughness, min: 0, max: 1, onChange: (v) => setSource({ roughness: v }), format: pct },
+        { label: "气泡音", value: s.fry, min: 0, max: 1, onChange: (v) => setSource({ fry: v }), format: pct },
       ],
     },
     {
-      name: "Pitch",
-      encoders: [{ label: "Glide", value: s.glide, min: 0.005, max: 0.6, log: true, onChange: (v) => setSource({ glide: v }), format: (v) => ({ value: (v * 1000).toFixed(0), unit: "ms" }) }],
+      name: "滑音",
+      encoders: [{ label: "滑音", value: s.glide, min: 0.005, max: 0.6, log: true, onChange: (v) => setSource({ glide: v }), format: (v) => ({ value: (v * 1000).toFixed(0), unit: "ms" }) }],
     },
     {
-      name: "Mouth",
+      name: "嘴",
       encoders: [
-        { label: "Rounding", value: 1 - a.lipWidth, min: 0, max: 1, onChange: (v) => setArtic({ lipWidth: 1 - v }), format: pct },
-        { label: "Lips open", value: a.lipAp, min: -0.3, max: 2.2, onChange: (v) => setArtic({ lipAp: v }), format: cm },
-        { label: "Protrude", value: a.lipProt, min: -0.1, max: 1.4, onChange: (v) => setArtic({ lipProt: v }), format: cm },
-        { label: "Jaw", value: a.jaw, min: 0, max: 2.4, onChange: (v) => setArtic({ jaw: v }), format: cm },
+        { label: "圆唇", value: 1 - a.lipWidth, min: 0, max: 1, onChange: (v) => setArtic({ lipWidth: 1 - v }), format: pct },
+        { label: "唇开", value: a.lipAp, min: -0.3, max: 2.2, onChange: (v) => setArtic({ lipAp: v }), format: cm },
+        { label: "前突", value: a.lipProt, min: -0.1, max: 1.4, onChange: (v) => setArtic({ lipProt: v }), format: cm },
+        { label: "下颌", value: a.jaw, min: 0, max: 2.4, onChange: (v) => setArtic({ jaw: v }), format: cm },
       ],
     },
     {
-      name: "Tongue",
+      name: "舌",
       encoders: [
-        { label: "Root", value: a.root, min: -0.9, max: 0.9, onChange: (v) => setArtic({ root: v }), format: signedCm },
-        { label: "Tip curl", value: a.ttCurl, min: 0, max: 1, onChange: (v) => setArtic({ ttCurl: v }), format: pct },
+        { label: "舌根", value: a.root, min: -0.9, max: 0.9, onChange: (v) => setArtic({ root: v }), format: signedCm },
+        { label: "舌尖卷", value: a.ttCurl, min: 0, max: 1, onChange: (v) => setArtic({ ttCurl: v }), format: pct },
       ],
     },
     {
-      name: "Throat",
+      name: "喉",
       encoders: [
-        { label: "Soft palate", value: a.velum, min: -0.25, max: 1.2, onChange: (v) => setArtic({ velum: v }), format: (v) => (v <= 0 ? { value: "Shut", unit: "" } : { value: v.toFixed(2), unit: "cm²" }) },
-        { label: "Larynx", value: a.larynx, min: -1.5, max: 1.5, onChange: (v) => setArtic({ larynx: v }), format: signedCm },
-        { label: "Twang", value: a.epilarynx, min: 0, max: 1, onChange: (v) => setArtic({ epilarynx: v }), format: pct },
-        { label: "False folds", value: a.ventricular, min: 0, max: 1, onChange: (v) => setArtic({ ventricular: v }), format: pct },
+        { label: "软腭", value: a.velum, min: -0.25, max: 1.2, onChange: (v) => setArtic({ velum: v }), format: (v) => (v <= 0 ? { value: "闭", unit: "" } : { value: v.toFixed(2), unit: "cm²" }) },
+        { label: "喉位", value: a.larynx, min: -1.5, max: 1.5, onChange: (v) => setArtic({ larynx: v }), format: signedCm },
+        { label: "咽紧", value: a.epilarynx, min: 0, max: 1, onChange: (v) => setArtic({ epilarynx: v }), format: pct },
+        { label: "假声带", value: a.ventricular, min: 0, max: 1, onChange: (v) => setArtic({ ventricular: v }), format: pct },
       ],
     },
   ];
-  return <EncoderPages label="Voice" pages={pages} />;
+  return <EncoderPages label="嗓音" pages={pages} />;
 }
 
 /** Hold breath and Whisper, for the voice screen's header. */
@@ -82,10 +82,10 @@ export function VoiceToggles() {
   return (
     <>
       <Chip on={hold} onClick={() => setHold(!hold)}>
-        Hold breath
+        屏息
       </Chip>
       <Chip on={!voiced} onClick={() => setSource({ voiced: !voiced })}>
-        Whisper
+        耳语
       </Chip>
     </>
   );

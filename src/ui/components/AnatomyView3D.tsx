@@ -228,7 +228,7 @@ export function AnatomyView3D(props: { slots?: SlotsFn; info?: InfoFn; showForma
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         if (r.caliper) {
           const [cx, cy] = r.project(r.caliper.x, r.caliper.y, r.caliper.z);
-          label(ctx, r.caliper.area <= 0.0005 ? "CLOSED" : `${r.caliper.area.toFixed(2)} CM²`, cx + 10, cy - 6, { size: 11, color: V.white, ls: 0.12 });
+          label(ctx, r.caliper.area <= 0.0005 ? "闭合" : `${r.caliper.area.toFixed(2)} CM²`, cx + 10, cy - 6, { size: 11, color: V.white, ls: 0.12 });
         }
         if (readouts) {
           const info = infoRef.current(m, f, tele).map((s) => s.toUpperCase());
@@ -267,7 +267,7 @@ export function AnatomyView3D(props: { slots?: SlotsFn; info?: InfoFn; showForma
     );
   return (
     <div ref={wrapRef} className="anatomy three">
-      <canvas ref={canvasRef} aria-label="Vocal tract in 3D. Drag to turn the head, scroll or pinch to zoom, double-click to go back to the starting view." role="img" />
+      <canvas ref={canvasRef} aria-label="3D 声道。拖动旋转头部，滚轮或双指缩放，双击回到初始视角。" role="img" />
     </div>
   );
 }

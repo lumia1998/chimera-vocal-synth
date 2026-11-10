@@ -27,7 +27,7 @@ async function run(viewport: { width: number; height: number }, tag: string) {
   await page.goto(url, { waitUntil: "networkidle" });
   await page.waitForTimeout(400);
   await page.screenshot({ path: `${outDir}/${tag}-0-idle.png` });
-  const startBtn = page.getByRole("button", { name: /breathe in and start/i });
+  const startBtn = page.getByRole("button", { name: /吸气并启动/ });
   await startBtn.click();
   await page.waitForTimeout(1800);
   await page.screenshot({ path: `${outDir}/${tag}-1-running.png` });
@@ -56,9 +56,9 @@ async function run(viewport: { width: number; height: number }, tag: string) {
   const loadText = await page.locator(".load").textContent().catch(() => null);
   logs.push(`[${tag}] load: ${loadText}`);
   // speak mode
-  await page.getByRole("radio", { name: "Speak" }).click();
+  await page.getByRole("radio", { name: "说话" }).click();
   await page.waitForTimeout(200);
-  await page.getByRole("button", { name: /^Speak$/ }).click();
+  await page.getByRole("button", { name: /^朗读$/ }).click();
   await page.waitForTimeout(1500);
   await page.screenshot({ path: `${outDir}/${tag}-3-speak.png`, fullPage: true });
   const trans = await page.locator(".transcription").textContent();
@@ -80,7 +80,7 @@ async function run(viewport: { width: number; height: number }, tag: string) {
   await page.waitForTimeout(700);
   await page.screenshot({ path: `${outDir}/${tag}-4-pad.png` });
   // sing mode: a key sings the marked syllable and moves the cursor; legato; a demo song
-  await page.getByRole("radio", { name: "Sing" }).click();
+  await page.getByRole("radio", { name: "唱歌" }).click();
   await page.waitForTimeout(600);
   const rms = () =>
     page.evaluate(() => {
@@ -109,14 +109,14 @@ async function run(viewport: { width: number; height: number }, tag: string) {
   const demoRms = await rms();
   const demoNow = await page.locator(".syl.now").textContent().catch(() => null);
   await page.screenshot({ path: `${outDir}/${tag}-5-sing.png`, fullPage: tag !== "desktop" });
-  await page.getByRole("button", { name: /^Stop “Made of air”$/ }).click();
+  await page.getByRole("button", { name: /^停止“Made of air”$/ }).click();
   await page.waitForTimeout(700);
   const demoStopped = await rms();
   logs.push(`[${tag}] sing demo: rms ${demoRms.toFixed(4)} on "${demoNow}", after stop ${demoStopped.toFixed(4)}`);
   if (!(demoRms > 0.01) || !demoNow) errors.push(`[${tag}] demo song not singing (rms ${demoRms}, syllable ${demoNow})`);
   if (!(demoStopped < 1e-3)) errors.push(`[${tag}] demo still sounding after stop: ${demoStopped}`);
   // bestiary: every creature, its first call, a key in held-voice mode, and the sustain toggle
-  await page.getByRole("radio", { name: "Bestiary" }).click();
+  await page.getByRole("radio", { name: "动物" }).click();
   await page.waitForTimeout(300);
   const names = await page.locator(".specimen-name").allTextContents();
   for (const [i, name] of names.entries()) {
@@ -124,7 +124,7 @@ async function run(viewport: { width: number; height: number }, tag: string) {
     await page.waitForTimeout(250);
     await page.locator(".call").first().click();
     await page.waitForTimeout(1300);
-    const slug = name.toLowerCase().replace(/[^a-z]+/g, "-");
+    const slug = name.toLowerCase().replace(/[^a-z]+/g, "-") || `creature-${i}`;
     if (tag === "desktop" || i === 0) await page.screenshot({ path: `${outDir}/${tag}-5-${slug}.png`, fullPage: tag !== "desktop" });
     const state = await page.evaluate(() => {
       // @ts-expect-error debug handle
@@ -144,10 +144,10 @@ async function run(viewport: { width: number; height: number }, tag: string) {
   await page.keyboard.up("g");
   logs.push(`[${tag}] held key: ${JSON.stringify(held)}`);
   // beatbox: preset, play, playhead + level from telemetry, a pad, stop
-  await page.getByRole("radio", { name: "Beatbox" }).click();
+  await page.getByRole("radio", { name: "节奏口技" }).click();
   await page.waitForTimeout(300);
   await page.getByRole("button", { name: "Breakbeat" }).click();
-  await page.getByRole("button", { name: "Play beat" }).click();
+  await page.getByRole("button", { name: "播放节奏" }).click();
   const beatSamples: { step: number; rms: number }[] = [];
   for (let i = 0; i < 8; i++) {
     await page.waitForTimeout(250);
@@ -163,10 +163,10 @@ async function run(viewport: { width: number; height: number }, tag: string) {
   logs.push(`[${tag}] beatbox steps ${beatSamples.map((b) => b.step).join(",")} rms ${beatSamples.map((b) => b.rms.toFixed(3)).join(",")}`);
   await page.locator(".pad").first().dispatchEvent("pointerdown");
   await page.waitForTimeout(300);
-  await page.getByRole("button", { name: "Stop" }).click();
+  await page.getByRole("button", { name: "停止" }).click();
   await page.waitForTimeout(300);
   // back to the human voice
-  await page.getByRole("radio", { name: "Play" }).click();
+  await page.getByRole("radio", { name: "演奏" }).click();
   await page.waitForTimeout(600);
   const human = await page.evaluate(() => {
     // @ts-expect-error debug handle
@@ -182,7 +182,7 @@ async function run(viewport: { width: number; height: number }, tag: string) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   page.on("pageerror", (e) => errors.push(`[first-key] pageerror: ${e.message}`));
   await page.goto(url, { waitUntil: "networkidle" });
-  await page.getByRole("radio", { name: "Sing" }).click();
+  await page.getByRole("radio", { name: "唱歌" }).click();
   await page.keyboard.down("d");
   await page.waitForTimeout(1200);
   const level = await page.evaluate(() => {

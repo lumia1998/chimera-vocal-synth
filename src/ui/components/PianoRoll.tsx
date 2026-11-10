@@ -115,5 +115,5 @@ export function PianoRoll() {
     const xn = left + (w - left) * NOW_AT;
     seg(ctx, xn, top, xn, h, V.white, 1, { dash: [3, 4], alpha: 0.6 });
   });
-  return <canvas ref={ref} className="instrument-canvas roll-canvas" aria-label="Piano roll: the notes played, their syllables, and the pitch actually sung" />;
+  return <canvas ref={ref} className="instrument-canvas roll-canvas" aria-label="钢琴卷帘：演奏的音符、音节和实际唱出的音高" />;
 }

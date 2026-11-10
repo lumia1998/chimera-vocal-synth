@@ -8,11 +8,11 @@ import { beam, beamPts, blockLineH, label, labelBlock, seg, wrapLabel, type Pt }
 
 /** rows of the score, coloured like the articulators on the face (lips pink, tongue green, soft palate white, glottis amber) */
 const ROWS: { name: string; keys: string[]; color: string }[] = [
-  { name: "Lips", keys: ["lipAp", "lipProt", "lipWidth", "labiodental"], color: V.pink },
-  { name: "Tongue tip", keys: ["ttX", "ttY", "ttCurl", "lateral"], color: V.green },
-  { name: "Tongue body", keys: ["tbX", "tbY", "root"], color: V.green },
-  { name: "Soft palate", keys: ["velum"], color: V.white },
-  { name: "Glottis", keys: ["abduction", "closure"], color: V.amber },
+  { name: "嘴唇", keys: ["lipAp", "lipProt", "lipWidth", "labiodental"], color: V.pink },
+  { name: "舌尖", keys: ["ttX", "ttY", "ttCurl", "lateral"], color: V.green },
+  { name: "舌体", keys: ["tbX", "tbY", "root"], color: V.green },
+  { name: "软腭", keys: ["velum"], color: V.white },
+  { name: "声门", keys: ["abduction", "closure"], color: V.amber },
 ];
 
 function rowOf(g: Gesture): number {
@@ -40,7 +40,7 @@ export function ScoreView() {
     const left = 104, right = w - 14, top = 18, bottom = h - 26;
     const rowH = (bottom - top) / (ROWS.length + 1);
     ROWS.forEach((r, i) => label(ctx, r.name.toUpperCase(), 14, top + rowH * (i + 0.62), { size: 9, color: r.color, ls: 0.16, alpha: 0.85 }));
-    label(ctx, "PITCH", 14, top + rowH * (ROWS.length + 0.62), { size: 9, color: V.amber, ls: 0.16, alpha: 0.85 });
+    label(ctx, "音高", 14, top + rowH * (ROWS.length + 0.62), { size: 9, color: V.amber, ls: 0.16, alpha: 0.85 });
     for (let i = 1; i <= ROWS.length + 1; i++) seg(ctx, left, top + rowH * i, right, top + rowH * i, V.frame, 1);
     if (!sp) {
       // on black over the rules, wrapped to the score's width
@@ -57,6 +57,8 @@ export function ScoreView() {
     const X = (t: number) => left + ((t - T0) / (T1 - T0)) * (right - left);
     const now = planNow(sp);
     const f0s: { t: number; f: number }[] = [];
+    // a consonant's dominant and secondary gestures carry the same label; draw it once
+    const drawn: { text: string; x: number; y: number }[] = [];
     for (const g of plan.gestures) {
       if (g.targets.f0 !== undefined) {
         f0s.push({ t: (g.t0 + g.t1) / 2, f: g.targets.f0 });
@@ -76,8 +78,12 @@ export function ScoreView() {
       p.lineTo(x1, yb);
       beam(ctx, p, ROWS[r].color, act > 0.05 ? 1.5 : 1.1, { alpha: act > 0.05 ? 0.6 + 0.4 * act : isVowel ? 0.42 : 0.75, hot: act > 0.5 });
       if (g.label && xb - xa > 10) {
-        const lbl = g.label === "aspiration" || g.label === "voiceless" ? "OPEN" : g.label === "velum" ? "LOWERED" : g.label;
-        label(ctx, lbl, (xa + xb) / 2, yb - 4, { size: 10, color: ROWS[r].color, align: "center", ls: 0.08, alpha: isVowel && act < 0.05 ? 0.6 : 1 });
+        const lbl = g.label === "aspiration" || g.label === "voiceless" ? "开" : g.label === "velum" ? "降" : g.label;
+        const lx = (xa + xb) / 2, ly = yb - 4;
+        if (!drawn.some((d) => d.text === lbl && Math.abs(d.x - lx) < 6 && Math.abs(d.y - ly) < 6)) {
+          drawn.push({ text: lbl, x: lx, y: ly });
+          label(ctx, lbl, lx, ly, { size: 10, color: ROWS[r].color, align: "center", ls: 0.08, alpha: isVowel && act < 0.05 ? 0.6 : 1 });
+        }
       }
     }
     // the pitch contour
@@ -88,7 +94,8 @@ export function ScoreView() {
       const pts: Pt[] = f0s.map((q) => [X(q.t), yb - ((q.f - fmin) / Math.max(1, fmax - fmin)) * (yb - ya)]);
       beamPts(ctx, pts, V.amber, 1.3);
       const lastP = pts[pts.length - 1];
-      label(ctx, `${Math.round(f0s[f0s.length - 1].f)} HZ`, lastP[0] + 6, lastP[1] + 3, { size: 9, color: V.amber, ls: 0.1 });
+      // keep the pitch readout inside the screen on a phone
+      label(ctx, `${Math.round(f0s[f0s.length - 1].f)} HZ`, Math.max(left, Math.min(lastP[0] + 6, right - 38)), lastP[1] + 3, { size: 9, color: V.amber, ls: 0.1 });
     }
     // segments along the bottom
     let lastRight = -Infinity;
@@ -113,5 +120,5 @@ export function ScoreView() {
       label(ctx, `${Math.max(0, now).toFixed(2)} S`, x + 8, top - 4, { size: 9, color: V.white, ls: 0.12, alpha: 0.8 });
     }
   });
-  return <canvas ref={ref} className="score-canvas" aria-label="Gestural score of the current utterance: which articulator moves, when, and how they overlap" role="img" />;
+  return <canvas ref={ref} className="score-canvas" aria-label="当前语句的姿态谱：哪个发声器官在何时移动、如何重叠" role="img" />;
 }

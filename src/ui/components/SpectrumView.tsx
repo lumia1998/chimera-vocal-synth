@@ -44,7 +44,7 @@ export function SpectrumView(props: { ring?: boolean }) {
       const p = new Path2D();
       p.rect(fx(2400), top - 6, fx(3600) - fx(2400), bot - top + 6);
       beam(ctx, p, V.white, 1, { dash: [3, 4], alpha: 0.6 });
-      label(ctx, "RING", fx(3600) + 4, top + 4, { size: 9, color: V.white, ls: 0.16 });
+      label(ctx, "咽紧", fx(3600) + 4, top + 4, { size: 9, color: V.white, ls: 0.16 });
     }
 
     // the output, from the analyser: stems at the harmonics while voiced, else the whole curve
@@ -114,5 +114,5 @@ export function SpectrumView(props: { ring?: boolean }) {
       label(ctx, `F0 ${Math.round(f0)}`, x - 9, bot + 13, { size: 9, color: V.green, align: "right", ls: 0.12 });
     }
   });
-  return <canvas ref={ref} className="instrument-canvas" aria-label="Output spectrum: harmonics, the vocal tract's resonances and its formants" role="img" />;
+  return <canvas ref={ref} className="instrument-canvas" aria-label="输出频谱：谐波、声道共振和共振峰" role="img" />;
 }

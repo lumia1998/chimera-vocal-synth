@@ -111,7 +111,7 @@ export function EncoderPages(props: { pages: EncoderPage[]; footer?: ReactNode; 
   return (
     <div className="enc-pages">
       {props.pages.length > 1 && (
-        <div className="enc-tabs" role="group" aria-label={`${props.label} pages`}>
+        <div className="enc-tabs" role="group" aria-label={`${props.label} 页`}>
           {props.pages.map((pg, i) => (
             <button key={pg.name} type="button" className={`enc-tab${i === page ? " on" : ""}`} aria-pressed={i === page} onClick={() => setPage(i)}>
               {pg.name}

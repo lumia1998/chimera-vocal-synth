@@ -26,10 +26,10 @@ export const singWords = mouthWords(sungNow, V.green);
 /** Sing mode's lines over the face: the note, the syllable, the ring */
 export const singInfo: InfoFn = (_m, _f, tele) => {
   const out: string[] = [];
-  if (tele && tele.t.voicing > 0.3) out.push(`Note ${noteName(tele.t.f0)} ${tele.t.f0.toFixed(0)} Hz`);
+  if (tele && tele.t.voicing > 0.3) out.push(`音高 ${noteName(tele.t.f0)} ${tele.t.f0.toFixed(0)} Hz`);
   const syl = syllableNow();
-  if (syl) out.push(`Syllable ${syl}`);
-  out.push(useStore.getState().artic.epilarynx >= RING - 0.05 ? "Ring on" : "Ring off");
+  if (syl) out.push(`音节 ${syl}`);
+  out.push(useStore.getState().artic.epilarynx >= RING - 0.05 ? "咽紧开" : "咽紧关");
   return out;
 };
 
@@ -50,31 +50,31 @@ function Lyrics() {
         onChange={(e) => setLyrics(e.target.value)}
         onKeyDown={(e) => e.stopPropagation()}
         rows={1}
-        aria-label="Lyrics to sing"
-        placeholder="Type the words to sing"
-        title="Each note sings the next syllable. Hold a key while you press the next one to sing legato. A lone “-” between words holds a vowel over several notes; hyphens split a word your way (“ti-ger”)."
+        aria-label="要唱的歌词"
+        placeholder="输入要唱的歌词"
+        title="每个音唱下一个音节。按住前一个键再按下一个键可连唱。单独的“-”把元音延续到后面的音；连字符可按你的方式切词。"
       />
-      <div className="syllables" role="group" aria-label="Syllables. Each note sings the marked one; choose another to start there.">
+      <div className="syllables" role="group" aria-label="音节。每个音唱标记的音节；点另一个可从那里开始。">
         {syllables.map((s, i) => (
           <span key={i} className={`syl-wrap${s.wordEnd ? " word-end" : ""}`}>
             <button
               className={`syl${!demo && i === cursor ? " next" : ""}${i === at ? " now" : ""}${i < done ? " sung" : ""}${s.melisma ? " held" : ""}`}
               onClick={() => setCursor(i)}
               aria-current={!demo && i === cursor ? "step" : undefined}
-              title={s.melisma ? "Held vowel: carries the previous syllable onto this note" : `Sing from “${s.text}”`}
+              title={s.melisma ? "延长的元音：把上一个音节带到这个音" : `从“${s.text}”开始唱`}
             >
               {s.text}
             </button>
             {s.phraseEnd && (
-              <span className="breath-mark" aria-label="breath">
+              <span className="breath-mark" aria-label="换气">
                 ’
               </span>
             )}
           </span>
         ))}
-        {!syllables.length && <span className="dim">No words: the keys sing “ah”.</span>}
+        {!syllables.length && <span className="dim">没有歌词：琴键唱“啊”。</span>}
         <Chip toggle={false} className="from-start" onClick={() => setCursor(0)} disabled={cursor === 0 && !demo}>
-          From the start
+          从头开始
         </Chip>
       </div>
     </div>
@@ -90,21 +90,21 @@ function SongControls() {
   const setVibrato = useSing((s) => s.setVibrato);
   return (
     <EncoderPages
-      label="Song voice"
+      label="歌声"
       pages={[
         {
-          name: "Song",
+          name: "歌声",
           encoders: [
-            { label: "Vibrato", value: vibrato, min: 0, max: 80, onChange: (v) => setVibrato(Math.round(v)), format: (v) => ({ value: String(Math.round(v)), unit: "cents" }) },
-            { label: "Rate", value: source.vibratoRate, min: 3.5, max: 7.5, onChange: (v) => setSource({ vibratoRate: v }), format: (v) => ({ value: v.toFixed(1), unit: "Hz" }) },
-            { label: "Breathy", value: source.breathiness, min: 0, max: 1, onChange: (v) => setSource({ breathiness: v }), format: (v) => ({ value: String(Math.round(v * 100)), unit: "%" }) },
+            { label: "颤音", value: vibrato, min: 0, max: 80, onChange: (v) => setVibrato(Math.round(v)), format: (v) => ({ value: String(Math.round(v)), unit: "cents" }) },
+            { label: "频率", value: source.vibratoRate, min: 3.5, max: 7.5, onChange: (v) => setSource({ vibratoRate: v }), format: (v) => ({ value: v.toFixed(1), unit: "Hz" }) },
+            { label: "气声", value: source.breathiness, min: 0, max: 1, onChange: (v) => setSource({ breathiness: v }), format: (v) => ({ value: String(Math.round(v * 100)), unit: "%" }) },
             // the singer's ring narrows the tube just above the folds, adding the bright band near 3 kHz
-            { label: "Ring", value: epilarynx, min: 0, max: 1, onChange: (v) => setArtic({ epilarynx: v }), format: (v) => ({ value: String(Math.round(v * 100)), unit: "%" }) },
+            { label: "咽紧", value: epilarynx, min: 0, max: 1, onChange: (v) => setArtic({ epilarynx: v }), format: (v) => ({ value: String(Math.round(v * 100)), unit: "%" }) },
           ],
         },
         {
-          name: "Tone",
-          encoders: [{ label: "Bright", value: source.brightness, min: 0, max: 1, onChange: (v) => setSource({ brightness: v }), format: (v) => ({ value: String(Math.round(v * 100)), unit: "%" }) }],
+          name: "音色",
+          encoders: [{ label: "明亮", value: source.brightness, min: 0, max: 1, onChange: (v) => setSource({ brightness: v }), format: (v) => ({ value: String(Math.round(v * 100)), unit: "%" }) }],
         },
       ]}
     />
@@ -116,7 +116,7 @@ function DemoSongs() {
   const start = useStore((s) => s.start);
   const demo = useSing((s) => s.demo);
   return (
-    <div className="demo-songs" role="group" aria-label="Demo songs">
+    <div className="demo-songs" role="group" aria-label="示例歌曲">
       {DEMO_SONGS.map((s) => (
         <Chip
           key={s.name}
@@ -129,7 +129,7 @@ function DemoSongs() {
             await playDemo(s.name, body, start);
           }}
         >
-          {demo === s.name ? `Stop “${s.name}”` : s.name}
+          {demo === s.name ? `停止“${s.name}”` : s.name}
         </Chip>
       ))}
     </div>
@@ -142,19 +142,19 @@ export function SingRight() {
   const next = useSing((s) => (s.demo ? null : (s.syllables[s.cursor]?.text ?? null)));
   return (
     <div className="right right-sing">
-      <Screen className="s-roll" title="Piano roll" sub="Notes and the pitch sung">
+      <Screen className="s-roll" title="钢琴卷帘" sub="音符与实际唱出的音高">
         <PianoRoll />
       </Screen>
-      <Screen className="s-lyrics" title="Lyrics" sub="Each note sings the next syllable" tools={<DemoSongs />}>
+      <Screen className="s-lyrics" title="歌词" sub="每个音唱下一个音节" tools={<DemoSongs />}>
         <Lyrics />
       </Screen>
-      <Screen className="s-spec" title="Spectrum" sub={ring ? "Ring on" : ""}>
+      <Screen className="s-spec" title="频谱" sub={ring ? "咽紧开" : ""}>
         <SpectrumView ring={ring} />
       </Screen>
-      <Screen className="s-voice" title="Voice">
+      <Screen className="s-voice" title="嗓音">
         <SongControls />
       </Screen>
-      <Screen className="s-keys" title="Keys" sub={next ? `Next: ${next}` : ""}>
+      <Screen className="s-keys" title="琴键" sub={next ? `下一个：${next}` : ""}>
         <Keys />
       </Screen>
     </div>

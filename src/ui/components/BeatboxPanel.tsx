@@ -10,11 +10,11 @@ import type { InfoFn, SlotsFn } from "./AnatomyView.tsx";
 import { V } from "../colors.ts";
 
 const AIR: Record<Airstream, string> = {
-  pulmonic: "Breath out",
-  ejective: "Larynx piston",
-  click: "Tongue suction",
-  ingressive: "Breath in",
-  voiced: "Voice",
+  pulmonic: "呼气",
+  ejective: "喉部活塞",
+  click: "舌吸",
+  ingressive: "吸气",
+  voiced: "嗓音",
 };
 
 const NOTE = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
@@ -38,10 +38,10 @@ export function useBeatStep(): number {
 
 /** Beatbox's readouts under the chin: the articulators a mouth drum uses */
 export const beatSlots: SlotsFn = (_m, a, f) => [
-  { label: "Jaw", value: a.jaw.toFixed(1), unit: "cm", color: V.red },
-  { label: "Lips", value: a.lipAp < 0.05 ? "Sealed" : a.lipWidth < 0.55 ? "Round" : "Open", color: V.pink },
-  { label: "Larynx", value: `${a.larynx >= 0 ? "+" : ""}${a.larynx.toFixed(1)}`, unit: "cm", color: V.green },
-  { label: "Soft palate", value: f.velumPort > 0.02 ? "Open" : "Shut", color: V.white },
+  { label: "下颌", value: a.jaw.toFixed(1), unit: "cm", color: V.red },
+  { label: "嘴唇", value: a.lipAp < 0.05 ? "闭紧" : a.lipWidth < 0.55 ? "圆" : "开", color: V.pink },
+  { label: "喉位", value: `${a.larynx >= 0 ? "+" : ""}${a.larynx.toFixed(1)}`, unit: "cm", color: V.green },
+  { label: "软腭", value: f.velumPort > 0.02 ? "开" : "闭", color: V.white },
 ];
 /** the big symbol owns the top right, so nothing else is written there */
 export const beatInfo: InfoFn = () => [];
@@ -105,7 +105,7 @@ function Sequencer() {
   const toggle = useStore((s) => s.toggleBeatStep);
   const now = useBeatStep();
   return (
-    <div className="seq-grid" style={{ "--steps": beat.steps.length } as React.CSSProperties} role="grid" aria-label="Beat pattern: one sound per step">
+    <div className="seq-grid" style={{ "--steps": beat.steps.length } as React.CSSProperties} role="grid" aria-label="节奏型：每步一个声音">
       {BEAT_SOUNDS.map((s) => (
         <div className="seq-row" role="row" key={s.id}>
           <span className="seq-label" role="rowheader">
@@ -120,7 +120,7 @@ function Sequencer() {
                 className={`cell${on ? " on" : ""}${i === now ? " now" : ""}${i % 4 === 0 ? " downbeat" : ""}`}
                 onClick={() => toggle(i, s.id)}
                 aria-pressed={on}
-                aria-label={`${s.name}, step ${i + 1}`}
+                aria-label={`${s.name}，第 ${i + 1} 步`}
               >
                 {on && s.id === "m" && st?.note !== undefined ? <span className="cell-note">{noteName(st.note)}</span> : null}
               </button>
@@ -149,28 +149,28 @@ function Transport() {
     <div className="transport">
       <div className="transport-top">
         <button className={`primary play${beat.playing ? " on" : ""}`} onClick={() => setPlaying(!beat.playing)} aria-pressed={beat.playing}>
-          {beat.playing ? "Stop" : "Play beat"}
+          {beat.playing ? "停止" : "播放节奏"}
         </button>
         <Chip on={mic} onClick={() => setMic(!mic)}>
-          Close mic
+          近讲麦克风
         </Chip>
       </div>
       <div className="transport-encoders">
         <EncoderPages
-          label="Transport"
+          label="走带"
           columns={2}
           pages={[
             {
-              name: "Tempo",
+              name: "速度",
               encoders: [
-                { label: "Tempo", value: beat.bpm, min: 60, max: 180, onChange: (v) => setTempo({ bpm: Math.round(v) }), format: (v) => ({ value: String(Math.round(v)), unit: "bpm" }) },
-                { label: "Swing", value: beat.swing, min: 0, max: 0.6, onChange: (v) => setTempo({ swing: v }), format: (v) => ({ value: String(Math.round(v * 100)), unit: "%" }) },
+                { label: "速度", value: beat.bpm, min: 60, max: 180, onChange: (v) => setTempo({ bpm: Math.round(v) }), format: (v) => ({ value: String(Math.round(v)), unit: "bpm" }) },
+                { label: "摇摆", value: beat.swing, min: 0, max: 0.6, onChange: (v) => setTempo({ swing: v }), format: (v) => ({ value: String(Math.round(v * 100)), unit: "%" }) },
               ],
             },
           ]}
         />
       </div>
-      <div className="examples presets" role="group" aria-label="Example beats">
+      <div className="examples presets" role="group" aria-label="示例节奏">
         {BEAT_PRESETS.map((p) => (
           <Chip key={p.name} on={beat.preset === p.name} toggle={false} onClick={() => loadPreset(p.name)}>
             {p.name}
@@ -178,10 +178,10 @@ function Transport() {
         ))}
       </div>
       <label className="sbn">
-        <span className="dim">Beat as text</span>
+        <span className="dim">文本节奏</span>
         <input
           value={text}
-          title="B kick, t hat, Pf snare, K rimshot, ^K inward, ! click, m hum (m:43 sets its note), . rest"
+          title="B 底鼓，t 踩镲，Pf 军鼓，K 边击，^K 内吸，! 弹舌，m 哼声（m:43 设定音高），. 休止"
           placeholder="B . t . | Pf . t ."
           spellCheck={false}
           onFocus={() => (editing.current = true)}
@@ -205,19 +205,19 @@ export function BeatboxRight() {
   const beat = useStore((s) => s.beat);
   return (
     <div className="right right-beatbox">
-      <Screen className="s-seq" title="Step sequencer" sub={`${beat.preset ?? "Your beat"} / ${beat.bpm} bpm`}>
+      <Screen className="s-seq" title="步进音序器" sub={`${beat.preset ?? "你的节奏"} / ${beat.bpm} bpm`}>
         <Sequencer />
       </Screen>
-      <Screen className="s-wf" title="Spectrogram" sub="Last two seconds / newest in front">
+      <Screen className="s-wf" title="频谱图" sub="最近两秒 / 新的在前">
         <Spectrogram />
       </Screen>
-      <Screen className="s-pads" title="Pads" sub="Keys 1 to 0">
+      <Screen className="s-pads" title="打击垫" sub="按键 1 到 0">
         <Pads />
       </Screen>
-      <Screen className="s-transport" title="Transport">
+      <Screen className="s-transport" title="走带">
         <Transport />
       </Screen>
-      <Screen className="s-keys s-keys-compact" title="Keys" sub="Hum a bass note">
+      <Screen className="s-keys s-keys-compact" title="琴键" sub="哼一个低音">
         <Keys />
       </Screen>
     </div>

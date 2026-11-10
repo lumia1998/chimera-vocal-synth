@@ -301,7 +301,8 @@ async function main() {
       for (const p of [...errs, ...warns]) console.log(`  ${p.warn ? "warn " : "ERROR"} ${p.kind.padEnd(11)} ${p.detail}`);
       if (errs.length) await page.screenshot({ path: `${out}/${w}x${h}-${state.replace(/[^a-z0-9]+/gi, "-")}.png`, fullPage: true });
     };
-    const mode = (m: string) => page.getByRole("radio", { name: new RegExp(`^${m}$`, "i") }).click();
+    const MODE_LABEL: Record<string, string> = { play: "演奏", speak: "说话", sing: "唱歌", bestiary: "动物", beatbox: "节奏口技" };
+    const mode = (m: string) => page.getByRole("radio", { name: MODE_LABEL[m] ?? m }).click();
     // every encoder page of the screens on the right (each page has its own labels)
     const pages = async (state: string) => {
       const tabs = page.locator(".right .enc-tab");
@@ -344,7 +345,7 @@ async function main() {
       }
       if (m === "speak") {
         // the gestural score with a phrase in it, mid-utterance
-        await page.getByRole("button", { name: /^Speak$/ }).click();
+        await page.getByRole("button", { name: /^朗读$/ }).click();
         await check("speak (running), speaking", 900);
       }
       if (m === "bestiary") {
@@ -353,8 +354,8 @@ async function main() {
         for (let i = 1; i < (await specimens.count()); i++) {
           await specimens.nth(i).click();
           const name = (await specimens.nth(i).locator(".specimen-name").textContent())?.trim();
-          await check(`bestiary (running), ${name}`);
-          await pages(`bestiary (running), ${name}`);
+          await check(`bestiary (running), ${i}-${name}`);
+          await pages(`bestiary (running), ${i}-${name}`);
         }
         await specimens.first().click();
       }

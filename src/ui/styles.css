@@ -51,7 +51,7 @@
   --caliper-dim: rgba(255, 179, 64, 0.45);
   --radius-s: 0;
   --radius-m: 0;
-  --font: "Hershey", "Archivo", system-ui, -apple-system, "Segoe UI", "Noto Sans", sans-serif;
+  --font: "Hershey", "Archivo", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, "Segoe UI", "Noto Sans", sans-serif;
   color-scheme: dark;
 }
 

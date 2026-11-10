@@ -13,7 +13,7 @@ export const PRESETS: Record<BodyName, BodyMix> = {
   child: { female: 0, child: 1 },
 };
 
-export const PRESET_LABEL: Record<BodyName, string> = { male: "Adult male", female: "Adult female", child: "Child" };
+export const PRESET_LABEL: Record<BodyName, string> = { male: "成年男声", female: "成年女声", child: "儿童" };
 
 const clamp01 = (x: number) => (Number.isFinite(x) ? Math.min(1, Math.max(0, x)) : 0);
 
@@ -53,12 +53,13 @@ export function blendLog(b: BodyMix, of: Record<BodyName, number>): number {
 /** Default pitch: the presets' (as the engine's `default_f0`), blended geometrically in between. */
 export const defaultF0 = (b: BodyMix) => blendLog(b, { male: 110, female: 205, child: 260 });
 
-/** "Adult female", or the blend's shares: "Male 40 · Female 30 · Child 30 %". */
+/** "成年女声", or the blend's shares: "男 40 · 女 30 · 童 30 %". */
 export function bodyLabel(b: BodyMix): string {
   const p = presetOf(b);
   if (p) return PRESET_LABEL[p];
+  const zh = { male: "男", female: "女", child: "童" } as const;
   const parts = bodyWeights(b)
     .filter(([, w]) => w > 0.005)
-    .map(([n, w]) => `${n[0].toUpperCase()}${n.slice(1)} ${Math.round(w * 100)}`);
+    .map(([n, w]) => `${zh[n]} ${Math.round(w * 100)}`);
   return `${parts.join(" · ")} %`;
 }

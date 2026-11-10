@@ -70,10 +70,10 @@ export function Keys() {
   return (
     <div className="keys-row">
       <MidiButton />
-      <div className="keys" data-layout="layered" aria-label="Keyboard. Computer keys A to semicolon play notes; Z and X change octave.">
+      <div className="keys" data-layout="layered" aria-label="键盘。电脑键 A 到分号演奏音符；Z 和 X 换八度。">
         <div className="white-row">
           {whites.map((m) => (
-            <button key={m} className={`key white${held.includes(m) ? " down" : ""}`} onPointerDown={press(m)} onPointerUp={release(m)} onPointerCancel={release(m)} aria-label={`Note ${m}`} />
+            <button key={m} className={`key white${held.includes(m) ? " down" : ""}`} onPointerDown={press(m)} onPointerUp={release(m)} onPointerCancel={release(m)} aria-label={`音符 ${m}`} />
           ))}
         </div>
         <div className="black-row">
@@ -81,7 +81,7 @@ export function Keys() {
             const b = m + 1;
             const hasBlack = isBlack(b) && i < whites.length - 1;
             return hasBlack ? (
-              <button key={b} className={`key black${held.includes(b) ? " down" : ""}`} style={{ left: `calc(${((i + 1) / whites.length) * 100}% - 1.1%)` }} onPointerDown={press(b)} onPointerUp={release(b)} onPointerCancel={release(b)} aria-label={`Note ${b}`} />
+              <button key={b} className={`key black${held.includes(b) ? " down" : ""}`} style={{ left: `calc(${((i + 1) / whites.length) * 100}% - 1.1%)` }} onPointerDown={press(b)} onPointerUp={release(b)} onPointerCancel={release(b)} aria-label={`音符 ${b}`} />
             ) : null;
           })}
         </div>
@@ -100,15 +100,15 @@ function MidiButton() {
     midi.status === "connecting"
       ? "Connecting…"
       : midi.status === "denied"
-        ? "Blocked by the browser"
+        ? "被浏览器阻止"
         : on
           ? midi.inputs.length
             ? midi.inputs.join(", ")
-            : "Plug one in"
+            : "请连接一个"
           : "Off";
   return (
-    <button className={`midi${on ? " on" : ""}`} aria-pressed={on} onClick={() => setMidi(!on)} title={on ? "Disconnect the MIDI keyboard" : "Play with a MIDI keyboard (the browser asks for access)"}>
-      <span className="midi-name">MIDI keyboard</span>
+    <button className={`midi${on ? " on" : ""}`} aria-pressed={on} onClick={() => setMidi(!on)} title={on ? "断开 MIDI 键盘" : "用 MIDI 键盘演奏（浏览器会请求权限）"}>
+      <span className="midi-name">MIDI 键盘</span>
       <span className="midi-status">{status}</span>
     </button>
   );

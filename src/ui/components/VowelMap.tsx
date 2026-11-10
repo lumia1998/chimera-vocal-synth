@@ -94,7 +94,7 @@ export function VowelMap() {
       onPointerMove={(e) => dragging.current && apply(e)}
       onPointerUp={() => (dragging.current = false)}
       onPointerCancel={() => (dragging.current = false)}
-      aria-label="Vowel map. Drag to morph between vowels."
+      aria-label="元音图。拖动可在元音之间变形。"
       role="slider"
       aria-valuetext="vowel position"
     />

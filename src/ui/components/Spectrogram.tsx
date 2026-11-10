@@ -81,9 +81,9 @@ export function Spectrogram() {
       seg(ctx, x, base, x, base + 4, V.blueDim, 1);
       label(ctx, t, x, base + 15, { size: 9, color: TEXT.secondary, align: "center", ls: 0.1 });
     }
-    label(ctx, "NOW", left + frontW + 6, base + 3, { size: 9, color: TEXT.secondary, ls: 0.14 });
+    label(ctx, "现在", left + frontW + 6, base + 3, { size: 9, color: TEXT.secondary, ls: 0.14 });
     label(ctx, `${(SLICES * EVERY).toFixed(0)} S AGO`, right + 4, base - depthY + 3, { size: 9, color: TEXT.secondary, ls: 0.14 });
-    if (!started) label(ctx, "START AUDIO TO SEE THE SOUND", left, 24, { size: 9, color: TEXT.secondary, ls: 0.16 });
+    if (!started) label(ctx, "启动音频以查看声音", left, 24, { size: 9, color: TEXT.secondary, ls: 0.16 });
   });
-  return <canvas ref={ref} className="instrument-canvas" aria-label="Waterfall spectrogram of the last two seconds of output" role="img" />;
+  return <canvas ref={ref} className="instrument-canvas" aria-label="最近两秒输出的瀑布频谱图" role="img" />;
 }

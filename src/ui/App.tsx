@@ -52,30 +52,30 @@ function TopBar() {
     <header className="topbar">
       <div className="brand">
         <span className="wordmark">Chimera</span>
-        <span className="tagline">A voice grown from a simulated airway</span>
+        <span className="tagline">由模拟声道长出的声音</span>
       </div>
       <Segmented<Mode>
-        label="Mode"
+        label="模式"
         value={mode}
         onChange={setMode}
         options={[
-          { value: "play", label: "Play" },
-          { value: "speak", label: "Speak" },
-          { value: "sing", label: "Sing" },
-          { value: "bestiary", label: "Bestiary" },
-          { value: "beatbox", label: "Beatbox" },
+          { value: "play", label: "演奏" },
+          { value: "speak", label: "说话" },
+          { value: "sing", label: "唱歌" },
+          { value: "bestiary", label: "动物" },
+          { value: "beatbox", label: "节奏口技" },
         ]}
       />
       {mode !== "bestiary" && (
         <div className="body-control">
           <Segmented<BodyName>
-            label="Body"
+            label="体型"
             value={presetOf(body)}
             onChange={(b) => setBody(PRESETS[b])}
             options={[
-              { value: "male", label: "Male" },
-              { value: "female", label: "Female" },
-              { value: "child", label: "Child" },
+              { value: "male", label: "男声" },
+              { value: "female", label: "女声" },
+              { value: "child", label: "童声" },
             ]}
           />
           <BodyPad />
@@ -83,19 +83,19 @@ function TopBar() {
       )}
       <div className="topbar-right">
         <label className="volume">
-          <span>Volume</span>
+          <span>音量</span>
           <input type="range" min={0} max={1} step={0.01} value={volume} onChange={(e) => setVolume(Number(e.target.value))} style={{ "--pos": `${volume * 100}%` } as React.CSSProperties} />
         </label>
         {started ? (
-          <span className="load" title="Share of the audio thread's time budget used by the simulation">
-            Engine load {Math.round(load * 100)} %
+          <span className="load" title="模拟占音频线程时间预算的比例">
+            引擎负载 {Math.round(load * 100)} %
           </span>
         ) : (
           <button className="primary" onClick={() => void start()} disabled={starting}>
-            {starting ? "Starting…" : "Start audio"}
+            {starting ? "启动中…" : "启动音频"}
           </button>
         )}
-        <a className="repo-link" href="https://github.com/jamesondh/chimera-vocal-synth" target="_blank" rel="noreferrer" aria-label="Source code on GitHub" title="Source code on GitHub">
+        <a className="repo-link" href="https://github.com/jamesondh/chimera-vocal-synth" target="_blank" rel="noreferrer" aria-label="源代码（GitHub）" title="源代码（GitHub）">
           <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true">
             <path
               fill="currentColor"
@@ -115,10 +115,10 @@ function ViewToggles() {
   return (
     <div className="view-toggles">
       {!bestiary && <Toggle label="3D" checked={view.threeD} onChange={(v) => setView({ threeD: v })} />}
-      <Toggle label="Sound pressure" checked={view.pressure} onChange={(v) => setView({ pressure: v })} />
-      {!bestiary && <Toggle label="Airflow" checked={view.particles} onChange={(v) => setView({ particles: v })} />}
-      <Toggle label={bestiary ? "Labels" : "Measurements"} checked={view.calipers} onChange={(v) => setView({ calipers: v })} />
-      {!bestiary && <Toggle label="Grid" checked={view.grid} onChange={(v) => setView({ grid: v })} />}
+      <Toggle label="声压" checked={view.pressure} onChange={(v) => setView({ pressure: v })} />
+      {!bestiary && <Toggle label="气流" checked={view.particles} onChange={(v) => setView({ particles: v })} />}
+      <Toggle label={bestiary ? "标签" : "测量"} checked={view.calipers} onChange={(v) => setView({ calipers: v })} />
+      {!bestiary && <Toggle label="网格" checked={view.grid} onChange={(v) => setView({ grid: v })} />}
     </div>
   );
 }
@@ -135,11 +135,11 @@ function StartPrompt() {
   const setBeatPlaying = useStore((s) => s.setBeatPlaying);
   if (started) return null;
   const copy = {
-    bestiary: ["Each animal's sound comes from a simulation of its own sound source and airway.", "Start and hear a call", "Then play its calls, or hold the keys to sustain it at a pitch."],
-    beatbox: ["Every drum here is a mouth sound: lips, tongue and larynx pushing, sealing and sucking air.", "Start the beat", "Then edit the pattern, tap the pads, or hum a bass note on the keys."],
-    speak: ["Every sound here is produced by simulating air moving through a throat, mouth and nose.", "Start the voice", "Then type something and press Speak, or tap a sound in the chart."],
-    sing: ["Every sound here is produced by simulating air moving through a throat, mouth and nose.", "Start and hear a song", "Then play the keys: each note sings the next syllable of the lyrics."],
-  }[mode as "bestiary" | "beatbox" | "speak" | "sing"] ?? ["Every sound here is produced by simulating air moving through a throat, mouth and nose.", "Breathe in and start", "Then drag the tongue, lips or jaw, or play the keys."];
+    bestiary: ["每种动物的声音都来自它自己的声源和声道模拟。", "启动并听一声", "然后点它的叫声，或按住琴键持续发声。"],
+    beatbox: ["这里的每个鼓点都是嘴里的声音：嘴唇、舌头和喉咙在推气、闭气、吸气。", "启动节拍", "然后编辑节奏、敲打击垫，或用琴键哼低音。"],
+    speak: ["这里每个声音都是空气穿过喉咙、嘴和鼻子模拟出来的。", "启动声音", "然后输入文字按朗读，或点辅音表里的音。"],
+    sing: ["这里每个声音都是空气穿过喉咙、嘴和鼻子模拟出来的。", "启动并听一首歌", "然后弹琴键：每个音唱歌词的下一个音节。"],
+  }[mode as "bestiary" | "beatbox" | "speak" | "sing"] ?? ["这里每个声音都是空气穿过喉咙、嘴和鼻子模拟出来的。", "吸气并启动", "然后拖动舌头、嘴唇或下颌，或弹琴键。"];
   return (
     <div className="start-prompt" data-layout="overlay">
       <p>{copy[0]}</p>
@@ -156,9 +156,9 @@ function StartPrompt() {
           else if (mode === "play") setHold(true);
         }}
       >
-        {starting ? "Starting…" : copy[1]}
+        {starting ? "启动中…" : copy[1]}
       </button>
-      {err ? <p className="error">Audio could not start: {err}. Reload the page and try again.</p> : <p className="hint">{copy[2]}</p>}
+      {err ? <p className="error">音频无法启动：{err}。请刷新页面再试。</p> : <p className="hint">{copy[2]}</p>}
     </div>
   );
 }
@@ -174,9 +174,9 @@ function LeftScreen() {
     <Screen
       className="left"
       focus
-      title={bestiary ? "Creature" : "Vocal tract"}
-      sub={bestiary ? "Airway / live" : `${bodyLabel(body)} / ${threeD ? "3D" : "midsagittal"}`}
-      label={bestiary ? "Live creature airway" : "Live vocal tract"}
+      title={bestiary ? "动物" : "声道"}
+      sub={bestiary ? "气道 / 实时" : `${bodyLabel(body)} / ${threeD ? "3D" : "正中矢状面"}`}
+      label={bestiary ? "实时动物气道" : "实时声道"}
       tools={<ViewToggles />}
     >
       <Suspense fallback={null}>
@@ -192,22 +192,22 @@ function PlayRight() {
   const f0 = useStore((s) => s.source.f0);
   return (
     <div className="right right-play">
-      <Screen className="s-tube" title="Tube" sub="Glottis to lips">
+      <Screen className="s-tube" title="声道" sub="声门到嘴唇">
         <TubeView />
       </Screen>
-      <Screen className="s-folds" title="Vocal folds" sub="Slowed 100×">
+      <Screen className="s-folds" title="声带" sub="慢放 100×">
         <Stroboscope />
       </Screen>
-      <Screen className="s-spec" title="Spectrum" sub="Resonances">
+      <Screen className="s-spec" title="频谱" sub="共振">
         <SpectrumView />
       </Screen>
-      <Screen className="s-vowels" title="Vowels" sub="F1 / F2">
+      <Screen className="s-vowels" title="元音" sub="F1 / F2">
         <VowelMap />
       </Screen>
-      <Screen className="s-voice" title="Voice" tools={<VoiceToggles />}>
+      <Screen className="s-voice" title="嗓音" tools={<VoiceToggles />}>
         <VoiceControls />
       </Screen>
-      <Screen className="s-keys" title="Keys" sub={`${Math.round(f0)} Hz`}>
+      <Screen className="s-keys" title="琴键" sub={`${Math.round(f0)} Hz`}>
         <Keys />
       </Screen>
     </div>

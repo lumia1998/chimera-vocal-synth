@@ -40,10 +40,10 @@ export function nearestVowel(m: VoiceModel, F1: number, F2: number): string {
 
 /** Play mode: the tongue as its nearest vowel, then jaw, lips and soft palate */
 export const articulatorSlots: SlotsFn = (m, a, f, formants) => [
-  formants.length >= 2 ? { label: "Tongue", value: nearestVowel(m, formants[0], formants[1]), color: V.green, ipa: true } : { label: "Tongue", value: "-", color: V.green },
-  { label: "Jaw", value: a.jaw.toFixed(1), unit: "cm", color: V.red },
-  { label: "Lips", value: a.lipAp.toFixed(1), unit: "cm", color: V.pink },
-  f.velumPort > 0.02 ? { label: "Soft palate", value: f.velumPort.toFixed(2), unit: "cm²", color: V.white } : { label: "Soft palate", value: "Shut", color: V.white },
+  formants.length >= 2 ? { label: "舌", value: nearestVowel(m, formants[0], formants[1]), color: V.green, ipa: true } : { label: "舌", value: "-", color: V.green },
+  { label: "下颌", value: a.jaw.toFixed(1), unit: "cm", color: V.red },
+  { label: "嘴唇", value: a.lipAp.toFixed(1), unit: "cm", color: V.pink },
+  f.velumPort > 0.02 ? { label: "软腭", value: f.velumPort.toFixed(2), unit: "cm²", color: V.white } : { label: "软腭", value: "闭", color: V.white },
 ];
 
 export function AnatomyView(props: { slots?: SlotsFn; info?: InfoFn; showFormants?: boolean; overlay?: OverlayFn }) {
@@ -217,7 +217,7 @@ export function AnatomyView(props: { slots?: SlotsFn; info?: InfoFn; showFormant
         onPointerUp={onUp}
         onPointerCancel={onUp}
         onDoubleClick={onDouble}
-        aria-label="Vocal tract cross-section. Drag the tongue, tongue tip, jaw, lips, soft palate or larynx handles."
+        aria-label="声道横截面。拖动舌头、舌尖、下颌、嘴唇、软腭或喉位控制点。"
         role="img"
       />
     </div>

@@ -60,12 +60,12 @@ export function BodyPad() {
       className="body-pad"
       role="slider"
       tabIndex={0}
-      aria-label="Body between male, female and child"
+      aria-label="男声、女声、儿童之间的体型"
       aria-valuetext={bodyLabel(body)}
       aria-valuenow={Math.round(body.child * 100)}
       aria-valuemin={0}
       aria-valuemax={100}
-      title={`${bodyLabel(body)} — drag between male, female and child; arrow keys step`}
+      title={`${bodyLabel(body)} — 在男声、女声、儿童之间拖动；方向键微调`}
       onPointerDown={(e) => {
         if (e.button !== 0) return;
         (e.currentTarget as Element).setPointerCapture(e.pointerId);
