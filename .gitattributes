@@ -1,0 +1,3 @@
+# Regenerated tables are written with LF; keep them byte-identical on Windows too (the
+# calibrate tests compare the working file to the generator's output).
+*.generated.json text eol=lf
